@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#2563eb" />
+    <meta
+      name="description"
+      content="نظام حجز المواعيد - الثانوية التأهيلية تالمست"
+    />
+    
+    <!-- Google Fonts pour l'arabe -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap RTL pour le responsive -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    
+    <title>الثانوية التأهيلية تالمست - حجز المواعيد</title>
+    
+    <style>
+      * {
+        font-family: 'Noto Sans Arabic', Arial, sans-serif;
+      }
+      
+      body {
+        margin: 0;
+        direction: rtl;
+        text-align: right;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+      
+      .main-container {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        margin: 2rem auto;
+        max-width: 1200px;
+        overflow: hidden;
+      }
+      
+      .header-section {
+        background: linear-gradient(45deg, #2563eb, #1d4ed8);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+      }
+      
+      .loading-spinner {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #2563eb;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      .btn-primary {
+        background: linear-gradient(45deg, #2563eb, #1d4ed8);
+        border: none;
+        border-radius: 8px;
+        padding: 12px 24px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+      
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+      }
+      
+      .form-control, .form-select {
+        border-radius: 8px;
+        border: 2px solid #e5e7eb;
+        padding: 12px 16px;
+        transition: border-color 0.3s ease;
+      }
+      
+      .form-control:focus, .form-select:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      }
+      
+      .card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease;
+      }
+      
+      .card:hover {
+        transform: translateY(-4px);
+      }
+      
+      .alert {
+        border-radius: 8px;
+        border: none;
+      }
+      
+      .table {
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      
+      .badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 500;
+      }
+      
+      @media (max-width: 768px) {
+        .main-container {
+          margin: 1rem;
+          border-radius: 10px;
+        }
+        
+        .header-section {
+          padding: 1.5rem;
+        }
+        
+        .container-fluid {
+          padding: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>يجب تفعيل JavaScript لتشغيل هذا التطبيق.</noscript>
+    <div id="root"></div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
