@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { api } from '../utils/api';
-import jsPDF from 'jspdf';
+import { downloadDailyExportPDF } from '../utils/reactPdfGenerator';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('appointments');
@@ -144,48 +144,15 @@ const AdminDashboard = () => {
       const response = await api.get(`/admin/appointments/export/${exportDate}`);
       
       if (response.data.success) {
-        const data = response.data;
-        const doc = new jsPDF();
+        const appointmentsData = {
+          date_formatted: response.data.date_formatted,
+          appointments: response.data.appointments,
+          statistics: response.data.statistics,
+          total: response.data.appointments.length,
+          exportedAt: new Date().toLocaleString('ar-SA')
+        };
         
-        // En-tête
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(16);
-        doc.text('الثانوية التأهيلية تالمست', 105, 20, { align: 'center' });
-        doc.text('قائمة المواعيد', 105, 30, { align: 'center' });
-        
-        doc.setFontSize(12);
-        doc.text(`التاريخ: ${data.date_formatted}`, 105, 45, { align: 'center' });
-        doc.text(`عدد المواعيد: ${data.total}`, 105, 55, { align: 'center' });
-        
-        // Tableau
-        let y = 75;
-        doc.setFont('helvetica', 'bold');
-        doc.text('الوقت', 20, y);
-        doc.text('الاسم', 50, y);
-        doc.text('الهاتف', 100, y);
-        doc.text('المستوى', 140, y);
-        doc.text('الحالة', 170, y);
-        
-        y += 5;
-        doc.line(15, y, 195, y);
-        y += 10;
-        
-        doc.setFont('helvetica', 'normal');
-        data.appointments.forEach((appointment) => {
-          if (y > 270) {
-            doc.addPage();
-            y = 20;
-          }
-          
-          doc.text(appointment.heure_formatted, 20, y);
-          doc.text(`${appointment.prenom} ${appointment.nom}`, 50, y);
-          doc.text(appointment.telephone, 100, y);
-          doc.text(appointment.niveau_scolaire.substring(0, 15), 140, y);
-          doc.text(appointment.statut, 170, y);
-          y += 8;
-        });
-        
-        doc.save(`mawaid_${data.date_formatted}.pdf`);
+        await downloadDailyExportPDF(appointmentsData);
         toast.success('تم إنشاء ملف PDF بنجاح');
       }
     } catch (error) {

@@ -3,7 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react
 import { Toaster } from 'react-hot-toast';
 import AppointmentForm from './components/AppointmentForm';
 import AdminDashboard from './components/AdminDashboard';
-import AppointmentConfirmation from './components/AppointmentConfirmation';
+import AppointmentPreview from './components/AppointmentPreview';
+import AppointmentSuccess from './components/AppointmentSuccess';
 import { Calendar, Users, BarChart3, Settings, Home, Phone, Mail } from 'lucide-react';
 import './styles/App.css';
 
@@ -25,37 +26,15 @@ function App() {
           }}
         />
         
-        <header className="header-section">
-          <div className="container">
-            <div className="row align-items-center">
-              <div className="col-md-8">
-                <h1 className="h2 mb-2">الثانوية التأهيلية تالمست</h1>
-                <h2 className="h4 mb-0 opacity-90">نظام حجز المواعيد للتسجيل</h2>
-              </div>
-              <div className="col-md-4 text-md-start text-center mt-3 mt-md-0">
-                <div className="contact-info">
-                  <div className="d-flex align-items-center justify-content-md-start justify-content-center text-sm">
-                    <Phone size={16} className="ms-2" />
-                    <span>+212 5XX XX XX XX</span>
-                  </div>
-                  <div className="d-flex align-items-center justify-content-md-start justify-content-center text-sm mt-1">
-                    <Mail size={16} className="ms-2" />
-                    <span>contact@lycee-talmest.ma</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </header>
-
         <Navigation currentView={currentView} setCurrentView={setCurrentView} />
 
         <main className="main-content">
           <Routes>
-            <Route path="/" element={<HomePage setCurrentView={setCurrentView} />} />
+            <Route path="/" element={<HomePage />} />
             <Route path="/appointment" element={<AppointmentForm />} />
+            <Route path="/confirmation-preview" element={<AppointmentPreview />} />
+            <Route path="/confirmation/:id" element={<AppointmentSuccess />} />
             <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/confirmation/:id" element={<AppointmentConfirmation />} />
           </Routes>
         </main>
 
@@ -64,9 +43,6 @@ function App() {
             <div className="row">
               <div className="col-12">
                 <p className="mb-2">© 2025 الثانوية التأهيلية تالمست - جميع الحقوق محفوظة</p>
-                <p className="text-sm opacity-75">
-                  تالمست، المغرب | هاتف: +212 5XX XX XX XX
-                </p>
               </div>
             </div>
           </div>
@@ -78,38 +54,37 @@ function App() {
 
 function Navigation({ currentView, setCurrentView }) {
   const location = useLocation();
-
   return (
     <nav className="navigation-bar">
-      <div className="container">
-        <div className="nav-items">
-          <Link 
-            to="/" 
-            className={`nav-item ${location.pathname === '/' ? 'active' : ''}`}
-            onClick={() => setCurrentView('home')}
-          >
-            <Home size={20} />
-            <span>الرئيسية</span>
-          </Link>
-          
-          <Link 
-            to="/appointment" 
-            className={`nav-item ${location.pathname === '/appointment' ? 'active' : ''}`}
-            onClick={() => setCurrentView('appointment')}
-          >
-            <Calendar size={20} />
-            <span>حجز موعد</span>
-          </Link>
-          
-          <Link 
-            to="/admin" 
-            className={`nav-item ${location.pathname === '/admin' ? 'active' : ''}`}
-            onClick={() => setCurrentView('admin')}
-          >
-            <Settings size={20} />
-            <span>الإدارة</span>
-          </Link>
-        </div>
+      <h1 className="nomEtablissement">ثانوية تالمست التأهيلية</h1>
+
+      <div className="nav-items">
+        <Link 
+          to="/" 
+          className={`nav-item ${location.pathname === '/' ? 'active' : ''}`}
+          onClick={() => setCurrentView('home')}
+        >
+          <Home size={20} />
+          <span>الرئيسية</span>
+        </Link>
+        
+        <Link 
+          to="/appointment" 
+          className={`nav-item ${location.pathname === '/appointment' ? 'active' : ''}`}
+          onClick={() => setCurrentView('appointment')}
+        >
+          <Calendar size={20} />
+          <span>حجز موعد</span>
+        </Link>
+        
+        <Link 
+          to="/admin" 
+          className={`nav-item ${location.pathname === '/admin' ? 'active' : ''}`}
+          onClick={() => setCurrentView('admin')}
+        >
+          <Settings size={20} />
+          <span>الإدارة</span>
+        </Link>
       </div>
     </nav>
   );
@@ -123,7 +98,7 @@ function HomePage({ setCurrentView }) {
           <div className="hero-section text-center mb-5">
             <h2 className="display-6 mb-4">مرحباً بكم في نظام حجز المواعيد</h2>
             <p className="lead mb-4">
-              احجز موعدك لتسجيل ابنك أو ابنتك في الثانوية التأهيلية تالمست بطريقة سهلة وسريعة
+              احجز موعدك لتسجيل ابنك أو ابنتك في ثانوية تالمست التأهيلية بطريقة سهلة وسريعة
             </p>
             <Link to="/appointment" className="btn btn-primary btn-lg px-5">
               <Calendar size={20} className="ms-2" />
@@ -143,8 +118,8 @@ function HomePage({ setCurrentView }) {
             <div className="col-md-4">
               <div className="feature-card card h-100 text-center p-4">
                 <Users size={48} className="text-primary mx-auto mb-3" />
-                <h5>بيانات الطالب</h5>
-                <p className="text-muted">أدخل البيانات الأساسية للطالب المراد تسجيله</p>
+                <h5>بيانات التلميذ</h5>
+                <p className="text-muted">أدخل البيانات الأساسية للتلميذ المراد تسجيله</p>
               </div>
             </div>
             

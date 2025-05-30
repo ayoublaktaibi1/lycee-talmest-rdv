@@ -1,24 +1,31 @@
+// components/AppointmentForm.jsx
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Calendar, Clock, User, MapPin, Phone, GraduationCap, Send } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { api } from '../utils/api';
 
 const AppointmentForm = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Récupérer les données d'édition si disponibles
+  const editData = location.state?.editData;
+  
   const [loading, setLoading] = useState(false);
   const [availableDates, setAvailableDates] = useState([]);
   const [availableSlots, setAvailableSlots] = useState([]);
-  const [selectedDate, setSelectedDate] = useState('');
-  const [selectedTime, setSelectedTime] = useState('');
+  
+  const [selectedDate, setSelectedDate] = useState(editData?.date_rdv || '');
+  const [selectedTime, setSelectedTime] = useState(editData?.heure_rdv || '');
   
   const [formData, setFormData] = useState({
-    nom: '',
-    prenom: '',
-    sexe: '',
-    adresse: '',
-    telephone: '',
-    niveau_scolaire: ''
+    nom: editData?.nom || '',
+    prenom: editData?.prenom || '',
+    sexe: editData?.sexe || '',
+    adresse: editData?.adresse || '',
+    telephone: editData?.telephone || '',
+    niveau_scolaire: editData?.niveau_scolaire || ''
   });
 
   const niveauxScolaires = [
@@ -45,6 +52,20 @@ const AppointmentForm = () => {
     }
   }, [selectedDate]);
 
+  // ✅ Corriger l'utilisation de toast
+  useEffect(() => {
+    if (editData) {
+      // Utiliser toast.success au lieu de toast.info
+      toast('يمكنك الآن تعديل البيانات', {
+        icon: 'ℹ️',
+        style: {
+          background: '#dbeafe',
+          color: '#1e40af',
+        },
+      });
+    }
+  }, [editData]);
+
   const fetchAvailableDates = async () => {
     try {
       setLoading(true);
@@ -63,7 +84,24 @@ const AppointmentForm = () => {
       setLoading(true);
       const response = await api.get(`/appointments/available-slots/${date}`);
       setAvailableSlots(response.data.slots);
-      setSelectedTime(''); // Reset selected time when date changes
+      
+      // Si on modifie et que le créneau n'est plus disponible, le déselectionner
+      if (editData && selectedTime) {
+        const isTimeStillAvailable = response.data.slots.some(slot => slot.time === selectedTime);
+        if (!isTimeStillAvailable) {
+          setSelectedTime('');
+          // ✅ Utiliser toast avec configuration personnalisée pour warning
+          toast('الوقت المحدد سابقاً لم يعد متاحاً. يرجى اختيار وقت آخر', {
+            icon: '⚠️',
+            style: {
+              background: '#fef3c7',
+              color: '#92400e',
+            },
+          });
+        }
+      } else {
+        setSelectedTime('');
+      }
     } catch (error) {
       console.error('Erreur lors du chargement des créneaux:', error);
       toast.error('خطأ في تحميل الأوقات المتاحة');
@@ -82,7 +120,6 @@ const AppointmentForm = () => {
 
   const handleDateSelect = (date) => {
     setSelectedDate(date);
-    setSelectedTime('');
   };
 
   const handleTimeSelect = (time) => {
@@ -125,34 +162,16 @@ const AppointmentForm = () => {
       return;
     }
 
-    try {
-      setLoading(true);
-      
-      const appointmentData = {
-        ...formData,
-        date_rdv: selectedDate,
-        heure_rdv: selectedTime
-      };
+    const appointmentData = {
+      ...formData,
+      date_rdv: selectedDate,
+      heure_rdv: selectedTime
+    };
 
-      const response = await api.post('/appointments', appointmentData);
-      
-      if (response.data.success) {
-        toast.success('تم حجز الموعد بنجاح!');
-        navigate(`/confirmation/${response.data.appointment.id}`);
-      } else {
-        toast.error(response.data.message || 'خطأ في حجز الموعد');
-      }
-    } catch (error) {
-      console.error('Erreur lors de la création du rendez-vous:', error);
-      if (error.response?.status === 409) {
-        toast.error('هذا الموعد غير متاح. يرجى اختيار موعد آخر');
-        fetchAvailableSlots(selectedDate); // Refresh slots
-      } else {
-        toast.error('خطأ في حجز الموعد. يرجى المحاولة مرة أخرى');
-      }
-    } finally {
-      setLoading(false);
-    }
+    // Passer les données via l'état de navigation
+    navigate('/confirmation-preview', { 
+      state: { appointmentData } 
+    });
   };
 
   return (
@@ -163,12 +182,21 @@ const AppointmentForm = () => {
             <div className="card-header bg-primary text-white text-center py-4">
               <h3 className="mb-0">
                 <Calendar className="ms-2" size={24} />
-                حجز موعد جديد
+                {editData ? 'تعديل الموعد' : 'حجز موعد جديد'}
               </h3>
-              <p className="mb-0 mt-2 opacity-90">املأ البيانات أدناه لحجز موعدك</p>
+              <p className="mb-0 mt-2 opacity-90">
+                {editData ? 'عدل البيانات حسب الحاجة' : 'املأ البيانات أدناه لحجز موعدك'}
+              </p>
             </div>
             
             <div className="card-body p-4">
+              {/* تنبيه للتعديل */}
+              {editData && (
+                <div className="alert alert-info mb-4">
+                  <strong>تعديل الموعد:</strong> يمكنك تعديل أي من البيانات أدناه ثم النقر على "متابعة للمراجعة"
+                </div>
+              )}
+
               <form onSubmit={handleSubmit}>
                 {/* بيانات الطالب */}
                 <div className="section-title mb-4">
@@ -357,12 +385,12 @@ const AppointmentForm = () => {
                     {loading ? (
                       <>
                         <div className="loading-spinner ms-2" style={{width: '20px', height: '20px'}}></div>
-                        جاري الحجز...
+                        جاري التحميل...
                       </>
                     ) : (
                       <>
                         <Send className="ms-2" size={20} />
-                        تأكيد الحجز
+                        متابعة للمراجعة
                       </>
                     )}
                   </button>
